@@ -2,7 +2,24 @@
 
 const pg = require("pg");
 
-const db = new pg.Client("postgresql:///lunchly");
+// to access .env variables
+const dotenv = require('dotenv');
+dotenv.config();
+
+let DB_URI;
+
+// to deal with invalid characters in password
+const URI_DB_PASSWORD = `${encodeURIComponent(process.env.DB_PASSWORD)}`
+
+if (process.env.NODE_ENV === "test") {
+    DB_URI = `postgresql://${process.env.DB_USER}:${URI_DB_PASSWORD}@localhost:${process.env.DB_PORT}/lunchly_test`;
+} else {
+    DB_URI = `postgresql://${process.env.DB_USER}:${URI_DB_PASSWORD}@localhost:${process.env.DB_PORT}/lunchly`;
+}
+
+let db = new pg.Client({
+    connectionString: DB_URI
+})
 
 db.connect();
 
